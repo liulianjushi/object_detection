@@ -1,0 +1,29 @@
+item {
+  id: 1
+  name: 'towercrane'
+}
+item {
+  id: 2
+  name: 'cementpump'
+}
+item {
+  id: 3
+  name: 'crane'
+}
+item {
+  id: 4
+  name: 'digr'
+}
+item {
+  id: 5
+  name: 'largetrunck'
+}
+item {
+  id: 6
+  name: 'workingcrane'
+}
+
+item {
+  id: 7
+  name: 'pile'
+}
