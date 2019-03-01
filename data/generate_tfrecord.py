@@ -30,7 +30,7 @@ def split_labels(labels_csv, train_csv, test_csv, split_rate=0.7):
     grouped_list = [gb.get_group(x) for x in gb.groups]
     total = len(grouped_list)
     train_index = np.random.choice(len(grouped_list), size=int(total * split_rate), replace=False)
-    test_index = np.setdiff1d(list(range(200)), train_index)
+    test_index = np.setdiff1d(list(range(total)), train_index)
     train = pd.concat([grouped_list[i] for i in train_index])
     test = pd.concat([grouped_list[i] for i in test_index])
     train.to_csv(train_csv, index=None)
