@@ -9,7 +9,7 @@ import numpy as np
 from tensorflow.contrib.predictor import predictor_factories
 
 label_map_path = "data/label_map.pbtxt"
-saved_model = "/data/zl/power_mechanics/model/saved_model"
+saved_model = "model/saved_model"
 
 label_map = label_map_util.load_labelmap(label_map_path)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=7, use_display_name=True)
@@ -38,7 +38,7 @@ value_dict = collections.OrderedDict([
     ('可视结果', '/')
 ])
 
-
+xml_list=[]
 
 def decide_overlap(boxes, values):
     iou = []
@@ -92,6 +92,7 @@ def result(value, output_dict):
         else:
             pass
         print(tuple(v.values()))
+        xml_list.append(tuple(v.values()))
 
     for i,det in enumerate(detected_list):
         if det==1:
@@ -106,6 +107,7 @@ def result(value, output_dict):
         v["d_xmax"] = box[3]
         v["大类"] =0
         print(tuple(v.values()))
+        xml_list.append(tuple(v.values()))
 
 
 def read_csv(image_dir, labels_csv):
@@ -142,12 +144,14 @@ def read_csv(image_dir, labels_csv):
             result(selected_value, output_dict)
 
     metrics = power_evaluator.evaluate()
-    print(metrics)
-    for cat in categories:
-        c_list = [cat["name"]]
-        precision = metrics["PerformanceByCategory/Precision@0.5IOU/b'{}'".format(cat["name"])]
-        ap = metrics["PerformanceByCategory/AP@0.5IOU/b'{}'".format(cat["name"])]
-        recall = metrics["PerformanceByCategory/Recall@0.5IOU/b'{}'".format(cat["name"])]
+    xml_list.append([""])
+    xml_list.append([""])
+    xml_list.append(['category_name', 'ap', 'precision', 'recall'])
+    for c in categories:
+        c_list = [c["name"]]
+        precision = metrics["PerformanceByCategory/Precision@0.5IOU/b'{}'".format(c["name"])]
+        ap = metrics["PerformanceByCategory/AP@0.5IOU/b'{}'".format(c["name"])]
+        recall = metrics["PerformanceByCategory/Recall@0.5IOU/b'{}'".format(c["name"])]
         if math.isnan(ap):
             c_list.append("nan")
         else:
@@ -162,8 +166,12 @@ def read_csv(image_dir, labels_csv):
             c_list.append("nan")
         else:
             c_list.append(recall[-1])
+        xml_list.append(c_list)
+    xml_list.append(['Precision/mAP@0.5IOU', metrics['Precision/mAP@0.5IOU']])
 
 
 if __name__ == '__main__':
-    read_csv("/data/zl/南瑞项目素材收集-新版/01.大型机械/00.图片/02.湖北现场", "data/labels.csv")
+    read_csv("/data/zl/南瑞项目素材收集-新版/01.大型机械/00.图片/02.湖北现场", "data/val_labels.csv")
+    xml_df = pd.DataFrame(xml_list, columns=list(value_dict.keys()))
+    xml_df.to_csv('big_mechanics_test.csv', index=None)
 

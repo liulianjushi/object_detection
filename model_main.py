@@ -19,17 +19,14 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-
-from absl import flags
-
 import tensorflow as tf
-
+from absl import flags
 from object_detection import model_hparams
 from object_detection import model_lib
 
-from make_data import csv_to_record
+tf.logging.set_verbosity(tf.logging.INFO)
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 gpu_options = tf.GPUOptions(allow_growth=True)
 tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
@@ -38,7 +35,7 @@ flags.DEFINE_string(
                               'where event and checkpoint files will be written.')
 flags.DEFINE_string('pipeline_config_path', "model/pipeline.config", 'Path to pipeline config '
                                                                      'file.')
-flags.DEFINE_integer('num_train_steps', 200000, 'Number of train steps.')
+flags.DEFINE_integer('num_train_steps', None, 'Number of train steps.')
 flags.DEFINE_boolean('eval_training_data', False,
                      'If training data should be evaluated for this job. Note '
                      'that one call only use this in eval-only mode, and '
@@ -65,7 +62,7 @@ FLAGS = flags.FLAGS
 
 
 def main(unused_argv):
-    config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir)
+    config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir, save_checkpoints_steps=100)
 
     train_and_eval_dict = model_lib.create_estimator_and_inputs(
         run_config=config,
@@ -112,7 +109,4 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
-    annotations_path = "/data/zl/南瑞项目素材收集-新版/01.大型机械/01.标注/02.湖北现场"
-    images_path = "/data/zl/南瑞项目素材收集-新版/01.大型机械/00.图片/02.湖北现场"
-    csv_to_record(images_path, annotations_path, 0.8)
     tf.app.run()
