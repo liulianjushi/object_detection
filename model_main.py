@@ -62,7 +62,7 @@ FLAGS = flags.FLAGS
 
 
 def main(unused_argv):
-    config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir, save_checkpoints_steps=100)
+    config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir, save_checkpoints_steps=1000)
 
     train_and_eval_dict = model_lib.create_estimator_and_inputs(
         run_config=config,
