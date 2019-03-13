@@ -149,4 +149,4 @@ if __name__ == '__main__':
     label_map_path = "data/label_map.pbtxt"
 
     generate_data = GenerateTFRecord(label_map_path=label_map_path, max_num_classes=7)
-    generate_data.make_data(annotations_path, images_path, 0.7)
+    generate_data.make_data(images_path, annotations_path, 0.7)
