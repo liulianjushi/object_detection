@@ -6,5 +6,8 @@ pandas==0.24.0
 opencv_python==4.0.0.21
 tensorflow-gpu==1.12.0
 Pillow==5.4.1
-absl==0.0
 protobuf==3.7.0
+Cython==0.29.6
+matplotlib==3.0.3
+dist/object_detection-0.1-py3-none-any.whl
+dist/slim-0.1-py3-none-any.whl
