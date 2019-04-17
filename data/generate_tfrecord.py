@@ -121,8 +121,8 @@ class GenerateTFRecord(object):
         val_num = test.groupby("name").size().reset_index(name='number')
         train.to_csv(self.train_csv, index=None)
         test.to_csv(self.test_csv, index=None)
-        print("Number of train dataset is\n :", train_num)
-        print("Number of val dataset is\n :", val_num)
+        print("Number of train dataset is:\n ", train_num)
+        print("Number of val dataset is:\n", val_num)
 
     def generate_tfrecord(self, images_path, csv_input, output_path):
         writer = tf.python_io.TFRecordWriter(output_path)

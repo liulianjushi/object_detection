@@ -1,6 +1,7 @@
+import os
+
 import cv2
 import numpy as np
-import os
 import tensorflow as tf
 from imutils import paths
 from object_detection.utils import label_map_util
