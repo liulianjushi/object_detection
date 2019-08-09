@@ -125,7 +125,7 @@ class GenerateTFRecord(object):
         print("Number of val dataset is:\n", val_num)
 
     def generate_tfrecord(self, images_path, csv_input, output_path):
-        writer = tf.python_io.TFRecordWriter(output_path)
+        writer = tf.io.TFRecordWriter(output_path)
         examples = pd.read_csv(csv_input)
         grouped = self.split(examples, 'filename')
         for group in grouped:
@@ -144,8 +144,8 @@ class GenerateTFRecord(object):
 
 
 if __name__ == '__main__':
-    annotations_path = "/data/zl/南瑞项目素材收集-新版/01.大型机械/01.标注/02.湖北现场"
-    images_path = "/data/zl/南瑞项目素材收集-新版/01.大型机械/00.图片/02.湖北现场"
+    annotations_path = "xml"
+    images_path = "images"
     label_map_path = "data/label_map.pbtxt"
 
     generate_data = GenerateTFRecord(label_map_path=label_map_path, max_num_classes=7)
