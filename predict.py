@@ -9,9 +9,11 @@ from object_detection.utils import visualization_utils as vis_util
 from tensorflow.contrib.predictor import predictor_factories
 from tqdm import tqdm
 
+from utils.boxes_to_xml import generate_xml
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "5"
-gpu_options = tf.GPUOptions(allow_growth=True)
-tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
+tf.compat.v1.Session(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
 
 saved_model = "model/saved_model"
 label_path = "data/label_map.pbtxt"
@@ -48,24 +50,24 @@ def darw_box(image, output_dict, category_index):
 
 
 def main(predictor, category_index, image_url):
-    new_path = image_url.replace("00.图片", "00.图片_检测结果")
+    new_path = image_url.replace("images1", "xml1")
     if not os.path.exists(new_path):
         os.makedirs(new_path)
     if os.path.isfile(image_url):
         image, output_dict = predict(predictor, image_url)
         image = darw_box(image, output_dict, category_index)
-        cv2.imwrite(os.path.join(new_path, image_url.split("/")[-1]), image)
+        generate_xml(image_url, image.shape, output_dict, category_index, new_path)
     else:
-        for file_name in tqdm(paths.list_images(image_url)):
+        for file_name in paths.list_images(image_url):
             try:
                 image, output_dict = predict(predictor, file_name)
                 image = darw_box(image, output_dict, category_index)
-                cv2.imwrite(os.path.join(new_path, file_name.split("/")[-1]), image)
+                generate_xml(file_name, image.shape, output_dict, category_index, new_path)
             except Exception as e:
                 continue
 
 
 if __name__ == '__main__':
-    image_url = "../南瑞项目素材收集-新版/01.大型机械/00.图片/02.湖北现场"
+    image_url = "/Users/james/Documents/haircut/images1"
     predictor, category_index = load_model(saved_model, label_path, 2)
     main(predictor, category_index, image_url)
