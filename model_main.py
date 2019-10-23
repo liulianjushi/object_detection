@@ -27,7 +27,7 @@ from object_detection import model_lib
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 gpu_options = tf.GPUOptions(allow_growth=True)
 tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
@@ -63,7 +63,9 @@ FLAGS = flags.FLAGS
 
 
 def main(unused_argv):
-    config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir, save_checkpoints_steps=1000)
+    strategy = tf.contrib.distribute.MirroredStrategy(num_gpus=2)
+
+    config = tf.estimator.RunConfig(model_dir=FLAGS.model_dir, save_checkpoints_steps=1000, train_distribute=strategy)
 
     train_and_eval_dict = model_lib.create_estimator_and_inputs(
         run_config=config,

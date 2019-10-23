@@ -44,7 +44,7 @@ class GenerateTFRecord(object):
         return [data(filename, gb.get_group(x)) for filename, x in zip(gb.groups.keys(), gb.groups)]
 
     def create_tf_example(self, group, path):
-        with tf.gfile.GFile(os.path.join(path, '{}'.format(group.filename)), 'rb') as fid:
+        with tf.io.gfile.GFile(os.path.join(path, '{}'.format(group.filename)), 'rb') as fid:
             encoded_jpg = fid.read()
         encoded_jpg_io = io.BytesIO(encoded_jpg)
         image = Image.open(encoded_jpg_io)
@@ -92,16 +92,29 @@ class GenerateTFRecord(object):
             root = tree.getroot()
             if root.findall('object') is not None:
                 for member in root.findall('object'):
-                    value = (root.find('filename').text,
-                             int(root.find('size')[0].text),
-                             int(root.find('size')[1].text),
-                             cat.index(member[0].text) + 1,
-                             member[0].text,
-                             int(member[4][1].text),
-                             int(member[4][0].text),
-                             int(member[4][3].text),
-                             int(member[4][2].text)
-                             )
+                    xmin = int(member[4][0].text)
+                    ymin = int(member[4][1].text)
+                    xmax = int(member[4][2].text)
+                    ymax = int(member[4][3].text)
+
+                    width = int(root.find('size')[0].text)
+                    height = int(root.find('size')[1].text)
+
+                    if xmin > width or ymin > height or xmax < 0 or ymax < 0:
+                        continue
+
+                    if xmin < 0:
+                        xmin = 0
+                    if ymin < 0:
+                        ymin = 0
+                    if xmax > width:
+                        xmax = width
+                    if ymax > height:
+                        ymax = height
+
+                    value = (
+                    root.find('filename').text, width, height, cat.index(member[0].text) + 1, member[0].text, ymin,
+                    xmin, ymax, xmax)
                     xml_list.append(value)
         column_name = ['filename', 'width', 'height', 'class', 'name', 'ymin', 'xmin', 'ymax', 'xmax']
         xml_df = pd.DataFrame(xml_list, columns=column_name)
@@ -137,16 +150,16 @@ class GenerateTFRecord(object):
     def make_data(self, images_path, annotations_path, rate):
         if not os.path.exists(self.labels_csv):
             self.xml_to_csv(annotations_path)
-        if not (os.path.exists(self.train_csv) and os.path.exists(self.test_csv)):
-            self.split_labels(rate)
-        self.generate_tfrecord(images_path, self.train_csv, self.train_record)
-        self.generate_tfrecord(images_path, self.test_csv, self.test_record)
+        # if not (os.path.exists(self.train_csv) and os.path.exists(self.test_csv)):
+        #     self.split_labels(rate)
+        # self.generate_tfrecord(images_path, self.train_csv, self.train_record)
+        # self.generate_tfrecord(images_path, self.test_csv, self.test_record)
 
 
 if __name__ == '__main__':
-    annotations_path = "xml"
-    images_path = "images"
+    annotations_path = "/Users/james/Downloads/xml1"
+    images_path = "/Users/james/Documents/haircut/images1"
     label_map_path = "data/label_map.pbtxt"
 
-    generate_data = GenerateTFRecord(label_map_path=label_map_path, max_num_classes=7)
+    generate_data = GenerateTFRecord(label_map_path=label_map_path, max_num_classes=2)
     generate_data.make_data(images_path, annotations_path, 0.7)

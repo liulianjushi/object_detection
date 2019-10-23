@@ -2,6 +2,9 @@ import glob
 import os
 import shutil
 import time
+
+import imutils
+import numpy as np
 import xml.etree.ElementTree as ET
 
 import cv2
@@ -49,13 +52,15 @@ def video_to_images(video_dir, image_dir, prefix="images", start=0, times=1.0):
                 break
             frame_num += 1
             if frame_num % int(cap.get(cv2.CAP_PROP_FPS) / times) == 0:
+                # dst_im = cv2.flip(frame, 0)  #原型：cv2.flip(src, flipCode[, dst]) → dst  flipCode表示对称轴 0：x轴  1：y轴.  -1：both
+                # frame = cv2.transpose(dst_im)
                 cv2.imwrite(os.path.join(image_dir, "{}_{}.png".format(prefix, str(start).zfill(5))), frame)
                 start += 1
         cap.release()
 
 
 if __name__ == '__main__':
-    video_to_images(r"F:\南瑞项目素材收集-新版\3560(烟)", r"F:\nanrui_new\wuhanshibin\images",
-                    prefix="yhsb_sd_20190328", start=9, times=0.5)
+    video_to_images(r"/Users/james/Documents/haircut/video2", r"/Users/james/Documents/haircut/images2",
+                    prefix="haircut", start=4629, times=3.0)
     # copy_file("/data/zl/南瑞项目素材收集-新版/01.大型机械/00.图片_未检测到/02.湖北现场")
     # remove_node(r"F:\南瑞项目素材收集-新版\01.大型机械\01.标注\02.湖北现场")

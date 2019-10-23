@@ -32,10 +32,10 @@ def generate_xml(filename, image_shape, output_dict, category_index, xml_dir):
         output_dict['detection_scores'] = output_dict['detection_scores'][index]
         for box, cl in zip(output_dict["detection_boxes"], output_dict["detection_classes"]):
             name = category_index[cl]["name"]  # class name
-            xmin = int(box[0])  # set correct index
-            ymin = int(box[1])  # set correct index
-            xmax = int(box[2])  # set correct index
-            ymax = int(box[3])  # set correct index
+            xmin = int(box[1])  # set correct index
+            ymin = int(box[0])  # set correct index
+            xmax = int(box[3])  # set correct index
+            ymax = int(box[2])  # set correct index
 
             obj = ET.SubElement(root, 'object')
             ET.SubElement(obj, 'name').text = name

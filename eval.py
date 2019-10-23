@@ -230,6 +230,6 @@ def read_csv(image_dir, labels_csv):
 
 
 if __name__ == '__main__':
-    read_csv("/data/zl/南瑞项目素材收集-新版/01.大型机械/00.图片/02.湖北现场", "data/labels.csv")
+    read_csv("/data/zl/南瑞项目素材收集-新版/01.大型机械/00.图片/02.湖北现场", "data/labels0.csv")
     xml_df = pd.DataFrame(xml_list, columns=list(value_dict.keys()))
     xml_df.to_csv('big_mechanics_test.csv', index=None)
