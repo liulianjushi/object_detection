@@ -1,7 +1,6 @@
 import os
 import xml.etree.cElementTree as ET
 
-import keras.applications
 import numpy as np
 
 

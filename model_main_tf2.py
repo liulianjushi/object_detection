@@ -27,15 +27,27 @@ python model_main_tf2.py -- \
   --pipeline_config_path=$PIPELINE_CONFIG_PATH \
   --alsologtostderr
 """
-from absl import flags
 import tensorflow as tf
+from absl import flags
 from object_detection import model_lib_v2
 
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    tf.config.set_visible_devices(gpus[1], 'GPU')
+    try:
+        # 设置GPU显存占用为按需分配
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # 异常处理
+        print(e)
 
-flags.DEFINE_string('pipeline_config_path', "models/my_efficientdet_d0/pipeline.config", 'Path to pipeline config '
+
+flags.DEFINE_string('pipeline_config_path', None, 'Path to pipeline config '
                                                   'file.')
-flags.DEFINE_integer('num_train_steps', 20000, 'Number of train steps.')
+flags.DEFINE_integer('num_train_steps', None, 'Number of train steps.')
 flags.DEFINE_bool('eval_on_train_data', False, 'Enable evaluating on train '
                                                'data (only supported in distributed training).')
 flags.DEFINE_integer('sample_1_of_n_eval_examples', None, 'Will sample one of '
@@ -45,10 +57,10 @@ flags.DEFINE_integer('sample_1_of_n_eval_on_train_examples', 5, 'Will sample '
                                                                 'where n is provided. This is only used if '
                                                                 '`eval_training_data` is True.')
 flags.DEFINE_string(
-    'model_dir', "models/my_efficientdet_d0", 'Path to output model directory '
+    'model_dir', None, 'Path to output model directory '
                        'where event and checkpoint files will be written.')
 flags.DEFINE_string(
-    'checkpoint_dir',None, 'Path to directory holding a checkpoint.  If '
+    'checkpoint_dir', None, 'Path to directory holding a checkpoint.  If '
                             '`checkpoint_dir` is provided, this binary operates in eval-only mode, '
                             'writing resulting metrics to `model_dir`.')
 
@@ -87,7 +99,7 @@ def main(unused_argv):
             sample_1_of_n_eval_on_train_examples=(
                 FLAGS.sample_1_of_n_eval_on_train_examples),
             checkpoint_dir=FLAGS.checkpoint_dir,
-            wait_interval=300, timeout=FLAGS.eval_timeout)
+            wait_interval=250, timeout=FLAGS.eval_timeout)
     else:
         if FLAGS.use_tpu:
             # TPU is automatically inferred if tpu_name is None and
@@ -109,7 +121,8 @@ def main(unused_argv):
                 train_steps=FLAGS.num_train_steps,
                 use_tpu=FLAGS.use_tpu,
                 checkpoint_every_n=FLAGS.checkpoint_every_n,
-                record_summaries=FLAGS.record_summaries)
+                record_summaries=FLAGS.record_summaries,
+                save_final_config=True)
 
 if __name__ == '__main__':
     tf.compat.v1.app.run()
