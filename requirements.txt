@@ -6,7 +6,7 @@ opencv_python==4.1.0.25
 pandas==0.25.0
 Pillow==6.1.0
 absl==0.0
-protobuf==3.9.1
+protobuf==3.18.3
 tqdm==4.33.0
 dist/object_detection-0.1-py3-none-any.whl
 dist/slim-0.1-py3-none-any.whl
